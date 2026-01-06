@@ -1,0 +1,35 @@
+raw_uri: ./data/raw
+output_uri: ./data/curated
+
+spark:
+  master: local[*]
+  app_name: datamine
+  shuffle_partitions: 64
+
+curation:
+  classes: [car, truck, pedestrian, cyclist, traffic_light, traffic_sign]
+  min_box_area: 64.0
+  frame_stride_ms: 200
+  require_tags: {}
+  exclude_tags: {}
+
+embedding:
+  backend: hashing
+  dim: 512
+  clip_model: ViT-B-32
+  clip_pretrained: laion2b_s34b_b79k
+  batch_size: 64
+
+selection:
+  dedup_threshold: 0.97
+  budget: 1000
+  text_queries:
+    - "a pedestrian crossing the street at night"
+    - "a cyclist in heavy rain"
+  query_top_k: 100
+
+quality_gates:
+  min_label_completeness: 0.95
+  min_box_validity: 0.98
+  min_class_balance: 0.5
+  max_duplicate_rate: 0.2
