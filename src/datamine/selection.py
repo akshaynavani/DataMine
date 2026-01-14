@@ -153,7 +153,7 @@ def select(
     if remaining > 0 and len(kept_ids):
         pos = {sid: i for i, sid in enumerate(kept_ids)}
         seeds = [pos[s] for s in selected]
-        chosen, gains = k_center_greedy(kept_emb, remaining + len(seeds) if not seeds else remaining, seeds)
+        chosen, gains = k_center_greedy(kept_emb, remaining, seeds)
         for i, g in zip(chosen, gains):
             sid = kept_ids[int(i)]
             if sid not in selected:
