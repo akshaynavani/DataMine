@@ -57,10 +57,10 @@ def load_embeddings(uri: str) -> tuple[list[str], np.ndarray]:
     return from_arrow(read_table(uri))
 
 
-def embed_dataframe(samples_df, embedder_factory: Callable[[], Embedder], dim: int):
+def embed_dataframe(samples_df, embedder_factory: Callable[[], Embedder]):
     """Distributed embedding with ``mapInArrow``: each executor builds its own embedder once
     per partition and streams Arrow record batches through it."""
-    out_schema = f"sample_id string, embedding array<float>, model string"
+    out_schema = "sample_id string, embedding array<float>, model string"
 
     def _embed(batches: Iterator[pa.RecordBatch]) -> Iterator[pa.RecordBatch]:
         embedder = embedder_factory()
