@@ -80,7 +80,7 @@ def write_table(table: pa.Table, uri: str, partition_cols: Iterable[str] | None 
             format="parquet",
             partitioning=partition_cols,
             partitioning_flavor="hive",
-            existing_data_behavior="overwrite_or_ignore",
+            existing_data_behavior="delete_matching",
         )
         return
     parent = loc.path.rsplit("/", 1)[0]

@@ -17,7 +17,6 @@ from dataclasses import dataclass, field
 
 import numpy as np
 import pyarrow as pa
-import pyarrow.compute as pc
 
 from datamine import embedding_store, selection
 from datamine.config import PipelineConfig
@@ -192,4 +191,4 @@ def text_search(cfg: PipelineConfig, query: str, k: int = 10) -> list[tuple[str,
     return index.search_ids(q, k)[0]
 
 
-__all__ = ["Pipeline", "PipelineResult", "Paths", "text_search", "pc"]
+__all__ = ["Pipeline", "PipelineResult", "Paths", "text_search"]
