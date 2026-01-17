@@ -152,3 +152,52 @@ def write_logs(out_dir: str | Path, cfg: SynthConfig | None = None) -> list[Path
                 fh.write(json.dumps(rec) + "\n")
         paths.append(path)
     return paths
+
+
+def to_sample_table(records: list[dict]):
+    """Pure-Python equivalent of the Spark extraction for small inputs and tests.
+
+    Mirrors :func:`datamine.spark.extract.extract_samples`: flattens ego/tags, converts
+    ``bbox`` arrays to typed coordinates and drops boxes without exactly four values.
+    """
+    import pyarrow as pa
+
+    from datamine.schema import SAMPLE_SCHEMA
+
+    rows = []
+    seen: set[str] = set()
+    for r in records:
+        if r.get("log_id") is None or r.get("timestamp_ns") is None or r.get("camera") is None:
+            continue
+        sid = f"{r['log_id']}:{r['camera']}:{r.get('frame_id')}"
+        if sid in seen:
+            continue
+        seen.add(sid)
+        ego = r.get("ego") or {}
+        tags = r.get("tags") or {}
+        labels = []
+        for l in r.get("labels") or []:
+            bbox = l.get("bbox") or []
+            if len(bbox) != 4:
+                continue
+            labels.append({
+                "track_id": l.get("track_id"),
+                "category": (l.get("category") or "").strip().lower() or None,
+                "x1": bbox[0], "y1": bbox[1], "x2": bbox[2], "y2": bbox[3],
+                "occluded": bool(l.get("occluded", False)),
+            })
+        rows.append({
+            "sample_id": sid,
+            "log_id": r["log_id"],
+            "frame_id": r.get("frame_id", -1),
+            "timestamp_ns": r["timestamp_ns"],
+            "camera": r["camera"],
+            "image_uri": r.get("image_uri"),
+            "width": r.get("width"),
+            "height": r.get("height"),
+            "ego_x": ego.get("x"), "ego_y": ego.get("y"), "ego_yaw": ego.get("yaw"), "ego_speed": ego.get("speed"),
+            "weather": tags.get("weather"), "time_of_day": tags.get("time_of_day"), "location": tags.get("location"),
+            "labels": labels,
+            "num_labels": len(labels),
+        })
+    return pa.Table.from_pylist(rows, schema=SAMPLE_SCHEMA)

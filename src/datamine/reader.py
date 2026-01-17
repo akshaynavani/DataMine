@@ -81,6 +81,8 @@ class ArrowReader:
         """Point lookup by sample id. Ids encode ``log_id:camera:frame`` so we can prune
         partitions before touching any file."""
         sample_ids = list(sample_ids)
+        if columns is not None and "sample_id" not in columns:
+            columns = ["sample_id", *columns]
         if not sample_ids:
             return conform(self.dataset.schema.empty_table())
         parts = [s.split(":") for s in sample_ids]
