@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Pipeline data and outputs
+data/
+*.parquet
+*.jsonl
+reports/
+
+# Spark
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+_SUCCESS
+
+# Model weights / caches
+*.pt
+*.pth
+.cache/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
